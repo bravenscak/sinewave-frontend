@@ -8,6 +8,9 @@ const LoginForm = () => {
   });
   
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,6 +24,10 @@ const LoginForm = () => {
         ...errors,
         [name]: ''
       });
+    }
+    
+    if (loginError) {
+      setLoginError('');
     }
   };
 
@@ -37,15 +44,47 @@ const LoginForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (validateForm()) {
-      console.log('Login attempt:', formData);
-      // TO DO: Slanje na backend
-      alert('Login attempt submitted!');
-    } else {
-      console.log('Form has errors, please fix them');
+      setIsLoading(true);
+      setLoginError('');
+      
+      try {
+        const response = await fetch('http://localhost:8080/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Login failed');
+        }
+        
+        localStorage.setItem('user', JSON.stringify({
+          id: data.id,
+          username: data.username,
+          firstname: data.firstname,
+          lastname: data.lastname,
+          email: data.email
+        }));
+        
+        setLoginSuccess(true);
+        
+        setTimeout(() => {
+          window.location.href = '/dashboard';
+        }, 2000);
+        
+      } catch (error) {
+        setLoginError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -53,6 +92,9 @@ const LoginForm = () => {
     <div className="login-container">
       <div className="login-form-container">
         <h1>SINEWAVE</h1>
+        
+        {loginError && <div className="login-error-message">{loginError}</div>}
+        {loginSuccess && <div className="login-success-message">Login successful!</div>}
         
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-group">
@@ -65,6 +107,7 @@ const LoginForm = () => {
               onChange={handleChange}
               required
               className={errors.username ? 'input-error' : ''}
+              disabled={isLoading || loginSuccess}
             />
             {errors.username && <div className="error-message">{errors.username}</div>}
           </div>
@@ -79,12 +122,19 @@ const LoginForm = () => {
               onChange={handleChange}
               required
               className={errors.password ? 'input-error' : ''}
+              disabled={isLoading || loginSuccess}
             />
             {errors.password && <div className="error-message">{errors.password}</div>}
           </div>
           
           <div className="form-group">
-            <button type="submit" className="login-button">Login</button>
+            <button 
+              type="submit" 
+              className="login-button"
+              disabled={isLoading || loginSuccess}
+            >
+              {isLoading ? 'Logging in...' : 'Login'}
+            </button>
           </div>
         </form>
       </div>

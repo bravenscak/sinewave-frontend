@@ -3,7 +3,7 @@ import RegistrationForm from './components/Register/Register';
 import LoginForm from './components/Login/Login';
 
 function App() {
-  const [currentForm, setCurrentForm] = useState('login'); // 'login' or 'register'
+  const [currentForm, setCurrentForm] = useState('login'); 
 
   const toggleForm = () => {
     setCurrentForm(currentForm === 'login' ? 'register' : 'login');

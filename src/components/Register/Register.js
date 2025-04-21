@@ -11,6 +11,9 @@ const RegistrationForm = () => {
   });
   
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [registrationError, setRegistrationError] = useState('');
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,6 +27,10 @@ const RegistrationForm = () => {
         ...errors,
         [name]: ''
       });
+    }
+
+    if (registrationError) {
+      setRegistrationError('');
     }
   };
 
@@ -44,15 +51,46 @@ const RegistrationForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (validateForm()) {
-      console.log('Form submitted:', formData);
-      // TO DO: Slanje na backend
-      alert('Registration form submitted successfully!');
-    } else {
-      console.log('Form has errors, please fix them');
+      setIsLoading(true);
+      setRegistrationError('');
+      
+      try {
+        const response = await fetch('http://localhost:8080/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Registration failed');
+        }
+        
+        setRegistrationSuccess(true);
+        setFormData({
+          firstName: '',
+          lastName: '',
+          username: '',
+          email: '',
+          password: ''
+        });
+        
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 2000);
+        
+      } catch (error) {
+        setRegistrationError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -60,6 +98,9 @@ const RegistrationForm = () => {
     <div className="register-container">
       <div className="register-form-container">
         <h1>SINEWAVE</h1>
+        
+        {registrationError && <div className="registration-error-message">{registrationError}</div>}
+        {registrationSuccess && <div className="registration-success-message">Registration successful! Redirecting to login...</div>}
         
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-group">
@@ -72,6 +113,7 @@ const RegistrationForm = () => {
               onChange={handleChange}
               required
               className={errors.firstName ? 'input-error' : ''}
+              disabled={isLoading || registrationSuccess}
             />
             {errors.firstName && <div className="error-message">{errors.firstName}</div>}
           </div>
@@ -86,6 +128,7 @@ const RegistrationForm = () => {
               onChange={handleChange}
               required
               className={errors.lastName ? 'input-error' : ''}
+              disabled={isLoading || registrationSuccess}
             />
             {errors.lastName && <div className="error-message">{errors.lastName}</div>}
           </div>
@@ -100,6 +143,7 @@ const RegistrationForm = () => {
               onChange={handleChange}
               required
               className={errors.username ? 'input-error' : ''}
+              disabled={isLoading || registrationSuccess}
             />
             {errors.username && <div className="error-message">{errors.username}</div>}
           </div>
@@ -114,6 +158,7 @@ const RegistrationForm = () => {
               onChange={handleChange}
               required
               className={errors.email ? 'input-error' : ''}
+              disabled={isLoading || registrationSuccess}
             />
             {errors.email && <div className="error-message">{errors.email}</div>}
           </div>
@@ -128,12 +173,19 @@ const RegistrationForm = () => {
               onChange={handleChange}
               required
               className={errors.password ? 'input-error' : ''}
+              disabled={isLoading || registrationSuccess}
             />
             {errors.password && <div className="error-message">{errors.password}</div>}
           </div>
           
           <div className="form-group">
-            <button type="submit" className="register-button">Register</button>
+            <button 
+              type="submit" 
+              className="register-button"
+              disabled={isLoading || registrationSuccess}
+            >
+              {isLoading ? 'Registering...' : 'Register'}
+            </button>
           </div>
         </form>
       </div>
