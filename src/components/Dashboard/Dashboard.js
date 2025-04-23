@@ -66,7 +66,6 @@ const Dashboard = () => {
         <div className="dashboard-section">
           <h3>Your Music</h3>
           <p>Your personalized dashboard is under construction.</p>
-          {/* Ovdje će doći više sadržaja ovisno o funkcionalnostima aplikacije */}
         </div>
       </div>
     </div>
