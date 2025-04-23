@@ -1,24 +1,32 @@
-import React, { useState } from 'react';
-import RegistrationForm from './components/Register/Register';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginForm from './components/Login/Login';
+import RegistrationForm from './components/Register/Register';
+import Dashboard from './components/Dashboard/Dashboard';
+import PrivateRoute from './components/PrivateRoute';
+import { isAuthenticated } from './utils/AuthUtils';
+import './App.css';
 
 function App() {
-  const [currentForm, setCurrentForm] = useState('login'); 
-
-  const toggleForm = () => {
-    setCurrentForm(currentForm === 'login' ? 'register' : 'login');
-  };
-
   return (
-    <div className="App">
-      {currentForm === 'login' ? <LoginForm /> : <RegistrationForm />}
-      
-      <div className="form-toggle-container">
-        <button onClick={toggleForm} className="toggle-button">
-          {currentForm === 'login' ? 'Need an account? Register' : 'Already have an account? Login'}
-        </button>
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/login" element={
+            isAuthenticated() ? <Navigate to="/dashboard" /> : <LoginForm />
+          } />
+          <Route path="/register" element={
+            isAuthenticated() ? <Navigate to="/dashboard" /> : <RegistrationForm />
+          } />
+          <Route path="/dashboard" element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          } />
+          <Route path="/" element={<Navigate to={isAuthenticated() ? "/dashboard" : "/login"} />} />
+        </Routes>
       </div>
-    </div>
+    </Router>
   );
 }
 

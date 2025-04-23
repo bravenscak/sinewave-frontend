@@ -66,13 +66,9 @@ const LoginForm = () => {
           throw new Error(data.message || 'Login failed');
         }
         
-        localStorage.setItem('user', JSON.stringify({
-          id: data.id,
-          username: data.username,
-          firstname: data.firstname,
-          lastname: data.lastname,
-          email: data.email
-        }));
+        localStorage.setItem('token', data.token);
+        
+        localStorage.setItem('user', JSON.stringify(data.user));
         
         setLoginSuccess(true);
         
