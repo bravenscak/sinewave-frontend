@@ -59,18 +59,39 @@ const RegistrationForm = () => {
       setRegistrationError('');
       
       try {
+        const backendFormData = {
+          firstname: formData.firstName,
+          lastname: formData.lastName,
+          username: formData.username,
+          email: formData.email,
+          password: formData.password
+        };
+        
         const response = await fetch('http://localhost:8080/api/auth/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(formData)
+          body: JSON.stringify(backendFormData)
         });
         
         const data = await response.json();
         
         if (!response.ok) {
           throw new Error(data.message || 'Registration failed');
+        }
+        
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 2000);
+        } else {
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
         }
         
         setRegistrationSuccess(true);
@@ -81,10 +102,6 @@ const RegistrationForm = () => {
           email: '',
           password: ''
         });
-        
-        setTimeout(() => {
-          window.location.href = '/login';
-        }, 2000);
         
       } catch (error) {
         setRegistrationError(error.message);
@@ -100,7 +117,7 @@ const RegistrationForm = () => {
         <h1>SINEWAVE</h1>
         
         {registrationError && <div className="registration-error-message">{registrationError}</div>}
-        {registrationSuccess && <div className="registration-success-message">Registration successful! Redirecting to login...</div>}
+        {registrationSuccess && <div className="registration-success-message">Registration successful! Redirecting...</div>}
         
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-group">
