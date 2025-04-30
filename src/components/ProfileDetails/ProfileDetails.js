@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { fetchWithAuth, getCurrentUser, logout } from '../../utils/AuthUtils';
+
 import CreatePlaylist from '../CreatePlaylist/CreatePlaylist';
 import './UserDetails.css';
 
-const Dashboard = () => {
+const ProfileDetails = () => {
   const [userData, setUserData] = useState(null);
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,6 +17,7 @@ const Dashboard = () => {
     if (user) {
       setUserData(user);
       fetchUserPlaylists();
+      setLoading(false);
     } else {
       fetchUserData();
     }
@@ -58,6 +60,8 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Greška pri dohvaćanju playlista:', error);
       setPlaylists([]);
+    } catch (error) {
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -88,7 +92,7 @@ const Dashboard = () => {
       
       <div className="dashboard-content">
         <div className="user-profile">
-          <h2>Welcome, {userData.firstname} {userData.lastname}!</h2>
+          <h2>Welcome, {userData.firstname} {userData.lastname}</h2>
           <div className="user-details">
             <p><strong>Username:</strong> {userData.username}</p>
             <p><strong>Email:</strong> {userData.email}</p>
@@ -130,8 +134,13 @@ const Dashboard = () => {
           onClose={() => setShowCreatePlaylist(false)}
         />
       )}
+          <p>Liked songs count:</p>
+          <p>My playlists count:</p>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Dashboard;
+
+export default ProfileDetails;

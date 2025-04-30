@@ -137,6 +137,12 @@
   .playlist-visibility {
     font-size: 12px;
     color: #777;
+
+    .dashboard-section h3 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
   }
   
   .dashboard-loading, 
