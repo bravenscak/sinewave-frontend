@@ -67,11 +67,76 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   
-  .dashboard-section h3 {
-    margin-top: 0;
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .section-header h3 {
+    margin: 0;
     color: #333;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
+  }
+  
+  .create-playlist-button {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+  }
+  
+  .create-playlist-button:hover {
+    background-color: #555;
+  }
+  
+  .no-playlists-message {
+    color: #6c757d;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .playlists-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .playlist-item {
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .playlist-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .playlist-item h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .playlist-item p {
+    margin: 5px 0;
+    color: #666;
+  }
+  
+  .playlist-visibility {
+    font-size: 12px;
+    color: #777;
   }
   
   .dashboard-loading, 
