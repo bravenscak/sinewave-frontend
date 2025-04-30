@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchWithAuth, getCurrentUser, logout } from '../../utils/AuthUtils';
 import CreatePlaylist from '../CreatePlaylist/CreatePlaylist';
-import './Dashboard.css';
+import './UserDetails.css';
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);

@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginForm from './components/Login/Login';
 import RegistrationForm from './components/Register/Register';
-import Dashboard from './components/Dashboard/Dashboard';
+import ProfileDetails from './components/ProfileDetails/ProfileDetails';
 import PrivateRoute from './components/PrivateRoute';
 import { isAuthenticated } from './utils/AuthUtils';
 import './App.css';
@@ -20,7 +20,7 @@ function App() {
           } />
           <Route path="/dashboard" element={
             <PrivateRoute>
-              <Dashboard />
+              <ProfileDetails />
             </PrivateRoute>
           } />
           <Route path="/" element={<Navigate to={isAuthenticated() ? "/dashboard" : "/login"} />} />
