@@ -60,8 +60,6 @@ const ProfileDetails = () => {
     } catch (error) {
       console.error('Greška pri dohvaćanju playlista:', error);
       setPlaylists([]);
-    } catch (error) {
-      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -137,8 +135,6 @@ const ProfileDetails = () => {
           <p>Liked songs count:</p>
           <p>My playlists count:</p>
         </div>
-      </div>
-    </div>
   );
 };
 
