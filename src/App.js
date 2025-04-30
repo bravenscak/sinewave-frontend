@@ -11,17 +11,41 @@ import MySongs from './components/MySongs/MySongs';
 import UploadSong from './components/UploadSong/UploadSong';
 import ProfileDetails from './components/ProfileDetails/ProfileDetails';
 
-
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/myplaylists" element={<MyPlaylists />} />
-        <Route path="/mysongs" element={<MySongs />} />
-        <Route path="/uploadsong" element={<UploadSong />} />
-        <Route path="/profiledetails" element={<ProfileDetails />} />
+        <Route path="/login" element={
+          isAuthenticated() ? <Navigate to="/profiledetails" /> : <LoginForm />
+        } />
+        <Route path="/register" element={
+          isAuthenticated() ? <Navigate to="/profiledetails" /> : <RegistrationForm />
+        } />
+        
+        <Route path="/dashboard" element={
+          <Navigate to="/profiledetails" />
+        } />
+        <Route path="/profiledetails" element={
+          <PrivateRoute>
+            <ProfileDetails />
+          </PrivateRoute>
+        } />
+        <Route path="/myplaylists" element={
+          <PrivateRoute>
+            <MyPlaylists />
+          </PrivateRoute>
+        } />
+        <Route path="/mysongs" element={
+          <PrivateRoute>
+            <MySongs />
+          </PrivateRoute>
+        } />
+        <Route path="/uploadsong" element={
+          <PrivateRoute>
+            <UploadSong />
+          </PrivateRoute>
+        } />
       </Routes>
     </Router>
   );
