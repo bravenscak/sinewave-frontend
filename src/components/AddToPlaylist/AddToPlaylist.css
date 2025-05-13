@@ -1,0 +1,134 @@
+.add-to-playlist-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.add-to-playlist-form {
+  width: 90%;
+  max-width: 500px;
+  background-color: white;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.add-to-playlist-form h2 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 30px;
+  font-size: 24px;
+  color: #333;
+}
+
+.add-to-playlist-content {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 500;
+  font-size: 16px;
+  color: #333;
+}
+
+.form-group input,
+.form-group select {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+  background-color: #fff;
+}
+
+.form-group input:disabled {
+  background-color: #f9f9f9;
+  color: #666;
+}
+
+.playlist-selection-container {
+  display: flex;
+  gap: 10px;
+}
+
+.playlist-selection-container select {
+  flex: 1;
+}
+
+.create-new-button {
+  padding: 12px 20px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.create-new-button:hover {
+  background-color: #444;
+}
+
+.create-new-button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.add-button {
+  padding: 12px 50px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.add-button:hover {
+  background-color: #444;
+}
+
+.add-button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.add-to-playlist-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.add-to-playlist-success {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  text-align: center;
+}
