@@ -12,8 +12,11 @@ import MySongs from './components/pages/MySongs';
 import UploadSong from './components/pages/UploadSong';
 import ProfileDetails from './components/pages/ProfileDetails';
 
+
 import './App.css';
 import NotFoundPage from './components/pages/NotFoundPage';
+import Dashboard from './components/pages/Dashboard';
+import CreatePlaylist from './components/pages/CreatePlaylist';
 
 function App(){
   const router = createBrowserRouter([
@@ -41,6 +44,14 @@ function App(){
   {
     path: '/myplaylists',
     element: <MyPlaylists/>
+  },
+  {
+    path: '/dashboard',
+    element: <Dashboard/>
+  },
+  {
+    path: '/createplaylist',
+    element: <CreatePlaylist/>
   }
   ]);
 

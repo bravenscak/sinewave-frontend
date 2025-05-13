@@ -1,32 +1,33 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import bgImage from '../img/5af4b12d-098e-4050-9de0-44cc5855d855.png';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const LandingPage = () => {
-  const navItems = ["Register", "Login", "MyPlaylists", "MySongs", "ProfileDetails", "UploadSong"];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-800 to-black text-white">
-      <nav className="flex items-center justify-between px-8 py-6 bg-black bg-opacity-30 backdrop-blur-md">
-        <h1 className="text-3xl font-bold tracking-widest text-white">SINEWAVE</h1>
-        <ul className="flex space-x-6 text-lg font-medium">
-          {navItems.map((item) => (
-            <li key={item}>
-              <a
-                href={`${item.toLowerCase()}`}
-                className="hover:text-indigo-300 transition"
-              >
-                {item}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-      <div>
-        <section>
-          <img alt="" src='../img/5af4b12d-098e-4050-9de0-44cc5855d855.png'/>
-        </section>
+    <div
+      className="d-flex flex-column justify-content-center align-items-center text-white text-center"
+      style={{
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        height: '100vh',
+        width: '100vw',
+      }}
+    >
+      <h1 className="display-1 fw-bold mb-4" style={{ textShadow: '2px 2px 5px rgba(0,0,0,0.7)' }}>
+        SineWave
+      </h1>
+      <div className="d-flex gap-3">
+        <Link to="/login" className="btn btn-light btn-lg">
+          Login
+        </Link>
+        <Link to="/register" className="btn btn-light btn-lg">
+          Register
+        </Link>
       </div>
     </div>
   );
-}
+};
 
 export default LandingPage;
