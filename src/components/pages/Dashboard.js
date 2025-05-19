@@ -5,9 +5,8 @@ import avatar from '../img/default-avatar.webp';
 
 const Dashboard = () => {
   const [playlists, setPlaylists] = useState([
-    "Chill Vibes",
-    "Workout Mix",
-    "Top Hits",
+    "Test",
+    "Test2"
   ]);
   const [songs, setSongs] = useState([
     { name: "Blinding Lights", artist: "The Weeknd", genre: "Pop" },
