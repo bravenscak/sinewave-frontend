@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { fetchWithAuth, getCurrentUser, logout } from '../../utils/AuthUtils';
+import { fetchWithAuth, getCurrentUser, logout } from '../../Utils/AuthUtils';
 
-import CreatePlaylist from '../CreatePlaylist/CreatePlaylist';
-import './UserDetails.css';
+import CreatePlaylist from './CreatePlaylist';
+import '../css/UserDetails.css';
 
 const ProfileDetails = () => {
   const [userData, setUserData] = useState(null);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { fetchWithAuth, getCurrentUser, logout } from '../../utils/AuthUtils';
-import './UploadSong.css';
+import { fetchWithAuth, getCurrentUser, logout } from '../../Utils/AuthUtils';
+import '../css/UploadSong.css';
 
 const UploadSong = () => {
   const [message, setMessage] = useState('Drag the mp3 file into the box...');

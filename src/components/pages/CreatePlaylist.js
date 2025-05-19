@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './CreatePlaylist.css';
+import '../css/CreatePlaylist.css';
 
 const CreatePlaylist = ({ onPlaylistCreated, onClose }) => {
   const [playlistData, setPlaylistData] = useState({
