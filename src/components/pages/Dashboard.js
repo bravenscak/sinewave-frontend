@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import { fetchWithAuth, getCurrentUser, logout } from '../../Utils/AuthUtils';
 import CreatePlaylist from './CreatePlaylist';
+import AddToPlaylist from './AddToPlaylist';
 import "bootstrap/dist/css/bootstrap.min.css";
 import avatar from '../img/default-avatar.webp';
 
@@ -15,6 +16,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
+  const [showAddToPlaylist, setShowAddToPlaylist] = useState(false);
+  const [selectedSong, setSelectedSong] = useState(null);
 
   const fetchSongs = async () => {
     try {
@@ -80,6 +83,16 @@ const Dashboard = () => {
       setUsers([]);
     }
   };
+
+  const handleAddToPlaylist = (song) => {
+    setSelectedSong(song);
+    setShowAddToPlaylist(true);
+  };
+
+  const handleAddToPlaylistSuccess = () => {
+    console.log('Song successfully added to playlist!');
+  };
+
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
       fetchSongs();
@@ -259,7 +272,11 @@ const Dashboard = () => {
                     <td>{song.genreName || 'Unknown Genre'}</td>
                     <td>{song.duration ? `${Math.floor(song.duration / 60)}:${(song.duration % 60).toString().padStart(2, '0')}` : 'N/A'}</td>
                     <td>
-                      <button className="btn btn-primary btn-sm me-1" title="Add to playlist">
+                      <button 
+                        className="btn btn-primary btn-sm me-1" 
+                        title="Add to playlist"
+                        onClick={() => handleAddToPlaylist(song)}
+                      >
                         ➕
                       </button>
                       <button className="btn btn-outline-danger btn-sm" title="Like">
@@ -361,6 +378,19 @@ const Dashboard = () => {
         <CreatePlaylist 
           onPlaylistCreated={handlePlaylistCreated}
           onClose={() => setShowCreatePlaylist(false)}
+        />
+      )}
+
+      {showAddToPlaylist && selectedSong && (
+        <AddToPlaylist
+          songId={selectedSong.id}
+          songName={selectedSong.title}
+          onClose={() => {
+            setShowAddToPlaylist(false);
+            setSelectedSong(null);
+            fetchDashboardData();
+          }}
+          onSuccess={handleAddToPlaylistSuccess}
         />
       )}
 
