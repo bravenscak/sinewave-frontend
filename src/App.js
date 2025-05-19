@@ -1,8 +1,6 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter as Router, Routes, Route, Navigate, RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { isAuthenticated } from './Utils/AuthUtils';
-import PrivateRoute from './components/PrivateRoute';
 
 import LoginForm from './components/pages/Login';
 import RegistrationForm from './components/pages/Register';
@@ -11,55 +9,54 @@ import MyPlaylists from './components/pages/MyPlaylists';
 import MySongs from './components/pages/MySongs';
 import UploadSong from './components/pages/UploadSong';
 import ProfileDetails from './components/pages/ProfileDetails';
-
-
-import './App.css';
-import NotFoundPage from './components/pages/NotFoundPage';
 import Dashboard from './components/pages/Dashboard';
 import CreatePlaylist from './components/pages/CreatePlaylist';
+import NotFoundPage from './components/pages/NotFoundPage';
 
-function App(){
-  const router = createBrowserRouter([
-    {
+import './App.css';
+
+const router = createBrowserRouter([
+  {
     path: '/',
-    element: <LandingPage/>,
-    errorElement: <NotFoundPage/>
+    element: <LandingPage />,
+    errorElement: <NotFoundPage />
   },
   {
     path: '/login',
-    element: <LoginForm/>
+    element: isAuthenticated() ? <Dashboard /> : <LoginForm />
   },
   {
     path: '/register',
-    element: <RegistrationForm/>
+    element: isAuthenticated() ? <Dashboard /> : <RegistrationForm />
   },
   {
     path: '/profiledetails',
-    element: <ProfileDetails/>
+    element: <ProfileDetails />
   },
   {
     path: '/mysongs',
-    element: <MySongs/>
+    element: <MySongs />
   },
   {
     path: '/myplaylists',
-    element: <MyPlaylists/>
+    element: <MyPlaylists />
   },
   {
     path: '/dashboard',
-    element: <Dashboard/>
+    element: <Dashboard />
+  },
+  {
+    path: '/uploadsong',
+    element: <UploadSong />
   },
   {
     path: '/createplaylist',
-    element: <CreatePlaylist/>
+    element: <CreatePlaylist />
   }
-  ]);
+]);
 
-  ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.StrictMode>
-        <RouterProvider router={router}/>
-    </React.StrictMode>
-  )
+function App() {
+  return <RouterProvider router={router} />;
 }
 
 export default App;
