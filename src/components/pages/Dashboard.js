@@ -11,9 +11,95 @@ const Dashboard = () => {
   const [users, setUsers] = useState([]);
   const [userData, setUserData] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [userSearchQuery, setUserSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
+
+  const fetchSongs = async () => {
+    try {
+      const songsResponse = await fetchWithAuth('http://localhost:8080/api/songs');
+      if (songsResponse.ok) {
+        const songsData = await songsResponse.json();
+        setSongs(songsData);
+      } else {
+        console.warn('Could not fetch songs, using placeholder data');
+        setSongs([
+          { id: 1, title: "Blinding Lights", artistName: "The Weeknd", genreName: "Pop", duration: 200 },
+          { id: 2, title: "Levitating", artistName: "Dua Lipa", genreName: "Pop", duration: 180 },
+          { id: 3, title: "Bohemian Rhapsody", artistName: "Queen", genreName: "Rock", duration: 354 },
+        ]);
+      }
+    } catch (error) {
+      console.error('Error fetching songs:', error);
+      setSongs([]);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const usersResponse = await fetchWithAuth('http://localhost:8080/api/users');
+      if (usersResponse.ok) {
+        const usersData = await usersResponse.json();
+        const currentUser = getCurrentUser();
+        const filteredUsers = usersData.filter(user => 
+          !currentUser || user.id !== currentUser.id
+        );
+        setUsers(filteredUsers);
+      } else {
+        console.warn('Could not fetch users:', usersResponse.status);
+        setUsers([]);
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setUsers([]);
+    }
+  };
+
+  const handleUserSearch = async () => {
+    if (!userSearchQuery.trim()) {
+      fetchUsers();
+      return;
+    }
+
+    try {
+      const response = await fetchWithAuth(`http://localhost:8080/api/users/search?username=${encodeURIComponent(userSearchQuery)}`);
+      if (response.ok) {
+        const searchResults = await response.json();
+        const currentUser = getCurrentUser();
+        const filteredResults = searchResults.filter(user => 
+          !currentUser || user.id !== currentUser.id
+        );
+        setUsers(filteredResults);
+      } else {
+        console.warn('User search failed:', response.status);
+        setUsers([]);
+      }
+    } catch (error) {
+      console.error('Error during user search:', error);
+      setUsers([]);
+    }
+  };
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      fetchSongs();
+      return;
+    }
+
+    try {
+      const response = await fetchWithAuth(`http://localhost:8080/api/songs/search?title=${encodeURIComponent(searchQuery)}`);
+      if (response.ok) {
+        const searchResults = await response.json();
+        setSongs(searchResults);
+      } else {
+        console.warn('Search failed:', response.status);
+        setSongs([]);
+      }
+    } catch (error) {
+      console.error('Error during search:', error);
+      setSongs([]);
+    }
+  };
 
   useEffect(() => {
     const user = getCurrentUser();
@@ -22,7 +108,7 @@ const Dashboard = () => {
     }
     
     fetchDashboardData();
-  }, []);
+  }, []); 
 
   const fetchDashboardData = async () => {
     try {
@@ -37,30 +123,9 @@ const Dashboard = () => {
         setPlaylists([]);
       }
 
-      const usersResponse = await fetchWithAuth('http://localhost:8080/api/users');
-      if (usersResponse.ok) {
-        const usersData = await usersResponse.json();
-        const filteredUsers = usersData.filter(user => 
-          !userData || user.id !== userData.id
-        );
-        setUsers(filteredUsers);
-      } else {
-        console.warn('Could not fetch users:', usersResponse.status);
-        setUsers([]);
-      }
+      await fetchUsers();
 
-      const songsResponse = await fetchWithAuth('http://localhost:8080/api/songs');
-      if (songsResponse.ok) {
-        const songsData = await songsResponse.json();
-        setSongs(songsData);
-      } else {
-        console.warn('Could not fetch songs, using placeholder data');
-        setSongs([
-          { id: 1, title: "Blinding Lights", artist: "The Weeknd", genre: "Pop" },
-          { id: 2, title: "Levitating", artist: "Dua Lipa", genre: "Pop" },
-          { id: 3, title: "Bohemian Rhapsody", artist: "Queen", genre: "Rock" },
-        ]);
-      }
+      await fetchSongs();
 
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -77,15 +142,6 @@ const Dashboard = () => {
   const handlePlaylistCreated = (newPlaylist) => {
     setPlaylists([...playlists, newPlaylist]);
     setShowCreatePlaylist(false);
-  };
-
-  const handleSearch = () => {
-    // TODO: Implement search functionality
-    const filteredSongs = songs.filter(song => 
-      song.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      song.artist?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setSongs(filteredSongs);
   };
 
   const handleLogout = () => {
@@ -161,13 +217,26 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="form-control"
-                placeholder="Search songs..."
+                placeholder="Search songs by title..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSearch();
+                  }
+                }}
               />
               <button className="btn btn-success" onClick={handleSearch}>
                 Search
               </button>
+              {searchQuery && (
+                <button className="btn btn-outline-secondary" onClick={() => {
+                  setSearchQuery('');
+                  fetchSongs();
+                }}>
+                  Clear
+                </button>
+              )}
             </div>
           </div>
           
@@ -186,9 +255,9 @@ const Dashboard = () => {
                 {songs.map((song) => (
                   <tr key={song.id}>
                     <td>{song.title}</td>
-                    <td>{song.artist || 'Unknown Artist'}</td>
-                    <td>{song.genre || 'Unknown Genre'}</td>
-                    <td>{song.duration ? `${song.duration}s` : 'N/A'}</td>
+                    <td>{song.artistName || 'Unknown Artist'}</td>
+                    <td>{song.genreName || 'Unknown Genre'}</td>
+                    <td>{song.duration ? `${Math.floor(song.duration / 60)}:${(song.duration % 60).toString().padStart(2, '0')}` : 'N/A'}</td>
                     <td>
                       <button className="btn btn-primary btn-sm me-1" title="Add to playlist">
                         ➕
@@ -231,7 +300,37 @@ const Dashboard = () => {
             </Link>
           </div>
           
-          <h6>Other Users ({users.length})</h6>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h6>Other Users ({users.length})</h6>
+          </div>
+          
+          <div className="mb-3">
+            <div className="input-group">
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                placeholder="Search users by username..."
+                value={userSearchQuery}
+                onChange={(e) => setUserSearchQuery(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleUserSearch();
+                  }
+                }}
+              />
+              <button className="btn btn-outline-success btn-sm" onClick={handleUserSearch}>
+                Search
+              </button>
+              {userSearchQuery && (
+                <button className="btn btn-outline-secondary btn-sm" onClick={() => {
+                  setUserSearchQuery('');
+                  fetchUsers();
+                }}>
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
           <div className="list-group">
             {users.map((user) => (
               <div key={user.id} className="list-group-item">
