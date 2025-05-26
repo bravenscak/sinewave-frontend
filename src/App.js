@@ -11,6 +11,7 @@ import UploadSong from './components/pages/UploadSong';
 import ProfileDetails from './components/pages/ProfileDetails';
 import Dashboard from './components/pages/Dashboard';
 import CreatePlaylist from './components/pages/CreatePlaylist';
+import UserWindow from './components/pages/UserWindow';
 import NotFoundPage from './components/pages/NotFoundPage';
 
 import './App.css';
@@ -52,6 +53,10 @@ const router = createBrowserRouter([
   {
     path: '/createplaylist',
     element: <CreatePlaylist />
+  },
+  {
+    path: '/user/:userId',
+    element: <UserWindow />
   }
 ]);
 
