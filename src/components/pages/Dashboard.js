@@ -18,6 +18,7 @@ const Dashboard = () => {
   const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
   const [showAddToPlaylist, setShowAddToPlaylist] = useState(false);
   const [selectedSong, setSelectedSong] = useState(null);
+  const [followStatus, setFollowStatus] = useState({});
 
   const fetchSongs = async () => {
     try {
@@ -39,16 +40,41 @@ const Dashboard = () => {
     }
   };
 
+  const sortUsers = (users, followStatus) => {
+    return [...users].sort((a, b) => {
+      if (followStatus[a.id] && !followStatus[b.id]) return -1;
+      if (!followStatus[a.id] && followStatus[b.id]) return 1;
+      return a.username.localeCompare(b.username);
+    });
+  };
+
   const fetchUsers = async () => {
     try {
-      const usersResponse = await fetchWithAuth('http://localhost:8080/api/users');
-      if (usersResponse.ok) {
-        const usersData = await usersResponse.json();
+      const [usersResponse, currentUserFollowing] = await Promise.all([
+        fetchWithAuth('http://localhost:8080/api/users'),
+        fetchWithAuth('http://localhost:8080/api/users/friends/following')
+      ]);
+      
+      if (usersResponse.ok && currentUserFollowing.ok) {
+        const [usersData, followingData] = await Promise.all([
+          usersResponse.json(),
+          currentUserFollowing.json()
+        ]);
+        
+        const followStatuses = {};
+        followingData.forEach(user => {
+          followStatuses[user.id] = true;
+        });
+        
         const currentUser = getCurrentUser();
         const filteredUsers = usersData.filter(user => 
           !currentUser || user.id !== currentUser.id
         );
-        setUsers(filteredUsers);
+        
+        const sortedUsers = sortUsers(filteredUsers, followStatuses);
+        
+        setUsers(sortedUsers);
+        setFollowStatus(followStatuses);
       } else {
         console.warn('Could not fetch users:', usersResponse.status);
         setUsers([]);
@@ -56,6 +82,37 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error fetching users:', error);
       setUsers([]);
+    }
+  };
+
+  const toggleFollow = async (userId) => {
+    try {
+      const isFollowing = followStatus[userId];
+      const endpoint = isFollowing ? 
+        `http://localhost:8080/api/users/friends/unfollow/${userId}` : 
+        `http://localhost:8080/api/users/friends/follow/${userId}`;
+      
+      const method = isFollowing ? 'DELETE' : 'POST';
+      
+      const response = await fetchWithAuth(endpoint, {
+        method,
+      });
+      
+      if (response.ok) {
+        const newFollowStatus = {
+          ...followStatus,
+          [userId]: !isFollowing
+        };
+        setFollowStatus(newFollowStatus);
+        
+        const sortedUsers = sortUsers(users, newFollowStatus);
+        setUsers(sortedUsers);
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to update follow status:', errorData);
+      }
+    } catch (error) {
+      console.error('Error toggling follow status:', error);
     }
   };
 
@@ -73,7 +130,9 @@ const Dashboard = () => {
         const filteredResults = searchResults.filter(user => 
           !currentUser || user.id !== currentUser.id
         );
-        setUsers(filteredResults);
+        
+        const sortedResults = sortUsers(filteredResults, followStatus);
+        setUsers(sortedResults);
       } else {
         console.warn('User search failed:', response.status);
         setUsers([]);
@@ -136,7 +195,7 @@ const Dashboard = () => {
         setPlaylists([]);
       }
 
-      await fetchUsers();
+      await fetchUsers(); 
 
       await fetchSongs();
 
@@ -351,17 +410,32 @@ const Dashboard = () => {
           <div className="list-group">
             {users.map((user) => (
               <div key={user.id} className="list-group-item">
-                <div className="d-flex align-items-center">
-                  <img
-                    src={user.profilepicture || avatar}
-                    alt={user.username}
-                    className="rounded-circle me-2"
-                    style={{ width: "30px", height: "30px", objectFit: "cover" }}
-                  />
-                  <div>
-                    <strong>{user.firstname} {user.lastname}</strong>
-                    <small className="d-block text-muted">@{user.username}</small>
+                <div className="d-flex align-items-center justify-content-between">
+                  <div className="d-flex align-items-center flex-grow-1">
+                    <img
+                      src={user.profilepicture || avatar}
+                      alt={user.username}
+                      className="rounded-circle me-2"
+                      style={{ width: "30px", height: "30px", objectFit: "cover" }}
+                    />
+                    <div>
+                      <strong>{user.firstname} {user.lastname}</strong>
+                      <small className="d-block text-muted">@{user.username}</small>
+                    </div>
                   </div>
+                  
+                  {/* Follow/Unfollow button */}
+                  <button
+                    className={`btn btn-sm ${
+                      followStatus[user.id] 
+                        ? 'btn-outline-secondary' 
+                        : 'btn-primary'
+                    }`}
+                    onClick={() => toggleFollow(user.id)}
+                    style={{ minWidth: '80px' }}
+                  >
+                    {followStatus[user.id] ? 'Unfollow' : 'Follow'}
+                  </button>
                 </div>
               </div>
             ))}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchWithAuth, getCurrentUser, logout } from '../../Utils/AuthUtils';
 
 import CreatePlaylist from './CreatePlaylist';
-import '../css/UserDetails.css';
+import '../css/ProfileDetails.css';
 
 const ProfileDetails = () => {
   const [userData, setUserData] = useState(null);
