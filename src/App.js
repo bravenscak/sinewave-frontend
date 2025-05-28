@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { isAuthenticated } from './Utils/AuthUtils';
+import { isAuthenticated, isAdmin } from './Utils/AuthUtils';
 
 import LoginForm from './components/pages/Login';
 import RegistrationForm from './components/pages/Register';
@@ -12,7 +12,9 @@ import ProfileDetails from './components/pages/ProfileDetails';
 import Dashboard from './components/pages/Dashboard';
 import CreatePlaylist from './components/pages/CreatePlaylist';
 import UserWindow from './components/pages/UserWindow';
+import AdminPanel from './components/pages/AdminPanel';
 import NotFoundPage from './components/pages/NotFoundPage';
+import PrivateAdminRoute from './components/PrivateAdminRoute';
 
 import './App.css';
 
@@ -24,11 +26,11 @@ const router = createBrowserRouter([
   },
   {
     path: '/login',
-    element: isAuthenticated() ? <Dashboard /> : <LoginForm />
+    element: isAuthenticated() ? (isAdmin() ? <AdminPanel /> : <Dashboard />) : <LoginForm />
   },
   {
     path: '/register',
-    element: isAuthenticated() ? <Dashboard /> : <RegistrationForm />
+    element: isAuthenticated() ? (isAdmin() ? <AdminPanel /> : <Dashboard />) : <RegistrationForm />
   },
   {
     path: '/profiledetails',
@@ -57,6 +59,14 @@ const router = createBrowserRouter([
   {
     path: '/user/:userId',
     element: <UserWindow />
+  },
+  {
+    path: '/admin',
+    element: (
+      <PrivateAdminRoute>
+        <AdminPanel />
+      </PrivateAdminRoute>
+    )
   }
 ]);
 

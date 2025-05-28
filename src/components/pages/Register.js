@@ -86,7 +86,11 @@ const RegistrationForm = () => {
           localStorage.setItem('user', JSON.stringify(data.user));
           
           setTimeout(() => {
-            window.location.href = '/dashboard';
+            if (data.user && data.user.role === 'ADMIN') {
+              window.location.href = '/admin';
+            } else {
+              window.location.href = '/dashboard';
+            }
           }, 2000);
         } else {
           setTimeout(() => {
