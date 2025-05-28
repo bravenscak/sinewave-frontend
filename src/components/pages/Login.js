@@ -48,45 +48,45 @@ const LoginForm = () => {
     e.preventDefault();
     
     if (validateForm()) {
-      setIsLoading(true);
-      setLoginError('');
-      
-      try {
-        const response = await fetch('http://localhost:8080/api/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData)
-        });
+        setIsLoading(true);
+        setLoginError('');
         
-        const data = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(data.message || 'Login failed');
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/login', {
+                method: 'POST',
+                credentials: 'include', 
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.message || 'Login failed');
+            }
+            
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            setLoginSuccess(true);
+            
+            setTimeout(() => {
+                if (data.user && data.user.role === 'ADMIN') {
+                    window.location.href = '/admin';
+                } else {
+                    window.location.href = '/dashboard';
+                }
+            }, 2000);
+            
+        } catch (error) {
+            setLoginError(error.message);
+        } finally {
+            setIsLoading(false);
         }
-        
-        localStorage.setItem('token', data.token);
-        
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        setLoginSuccess(true);
-        
-        setTimeout(() => {
-          if (data.user && data.user.role === 'ADMIN') {
-            window.location.href = '/admin';
-          } else {
-            window.location.href = '/dashboard';
-          }
-        }, 2000);
-        
-      } catch (error) {
-        setLoginError(error.message);
-      } finally {
-        setIsLoading(false);
-      }
     }
-  };
+};
 
   return (
     <div className="login-container">
