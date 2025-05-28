@@ -11,6 +11,11 @@ export const getToken = () => {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;
   };
+
+  export const isAdmin = () => {
+    const user = getCurrentUser();
+    return user && user.role === 'ADMIN';
+  };
   
   export const logout = () => {
     localStorage.removeItem('token');

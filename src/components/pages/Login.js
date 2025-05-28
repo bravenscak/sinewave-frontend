@@ -73,7 +73,11 @@ const LoginForm = () => {
         setLoginSuccess(true);
         
         setTimeout(() => {
-          window.location.href = '/dashboard';
+          if (data.user && data.user.role === 'ADMIN') {
+            window.location.href = '/admin';
+          } else {
+            window.location.href = '/dashboard';
+          }
         }, 2000);
         
       } catch (error) {
