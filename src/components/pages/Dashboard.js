@@ -9,6 +9,8 @@ import avatar from "../img/default-avatar.webp";
 const Dashboard = () => {
     const [playlists, setPlaylists] = useState([]);
     const [songs, setSongs] = useState([]);
+    const [allSongs, setAllSongs] = useState([]); 
+    const [selectedPlaylist, setSelectedPlaylist] = useState(null); 
     const [users, setUsers] = useState([]);
     const [userData, setUserData] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
@@ -27,10 +29,11 @@ const Dashboard = () => {
             );
             if (songsResponse.ok) {
                 const songsData = await songsResponse.json();
+                setAllSongs(songsData);
                 setSongs(songsData);
             } else {
                 console.warn("Could not fetch songs, using placeholder data");
-                setSongs([
+                const mockSongs = [
                     {
                         id: 1,
                         title: "Blinding Lights",
@@ -52,11 +55,44 @@ const Dashboard = () => {
                         genreName: "Rock",
                         duration: 354,
                     },
-                ]);
+                ];
+                setAllSongs(mockSongs);
+                setSongs(mockSongs);
             }
         } catch (error) {
             console.error("Error fetching songs:", error);
+            setAllSongs([]);
             setSongs([]);
+        }
+    };
+
+    const fetchPlaylistSongs = async (playlistId) => {
+        try {
+            const response = await fetchWithAuth(
+                `http://localhost:8080/api/playlists/${playlistId}/songs`
+            );
+            if (response.ok) {
+                const playlistSongs = await response.json();
+                setSongs(playlistSongs);
+            } else {
+                console.warn("Could not fetch playlist songs");
+                setSongs([]);
+            }
+        } catch (error) {
+            console.error("Error fetching playlist songs:", error);
+            setSongs([]);
+        }
+    };
+
+    const handlePlaylistClick = async (playlist) => {
+        if (selectedPlaylist && selectedPlaylist.id === playlist.id) {
+            setSelectedPlaylist(null);
+            setSongs(allSongs);
+            setSearchQuery("");
+        } else {
+            setSelectedPlaylist(playlist);
+            setSearchQuery("");
+            await fetchPlaylistSongs(playlist.id);
         }
     };
 
@@ -176,27 +212,48 @@ const Dashboard = () => {
 
     const handleAddToPlaylistSuccess = () => {
         console.log("Song successfully added to playlist!");
+        if (selectedPlaylist) {
+            fetchPlaylistSongs(selectedPlaylist.id);
+        }
     };
 
     const handleSearch = async () => {
         if (!searchQuery.trim()) {
-            fetchSongs();
+            if (selectedPlaylist) {
+                await fetchPlaylistSongs(selectedPlaylist.id);
+            } else {
+                setSongs(allSongs);
+            }
             return;
         }
 
         try {
-            const response = await fetchWithAuth(
-                `http://localhost:8080/api/songs/search?title=${encodeURIComponent(
-                    searchQuery
-                )}`
-            );
-            if (response.ok) {
-                const searchResults = await response.json();
-                setSongs(searchResults);
+            let searchResults;
+            if (selectedPlaylist) {
+                const playlistSongs = await fetchWithAuth(
+                    `http://localhost:8080/api/playlists/${selectedPlaylist.id}/songs`
+                );
+                if (playlistSongs.ok) {
+                    const allPlaylistSongs = await playlistSongs.json();
+                    searchResults = allPlaylistSongs.filter(song =>
+                        song.title.toLowerCase().includes(searchQuery.toLowerCase())
+                    );
+                } else {
+                    searchResults = [];
+                }
             } else {
-                console.warn("Search failed:", response.status);
-                setSongs([]);
+                const response = await fetchWithAuth(
+                    `http://localhost:8080/api/songs/search?title=${encodeURIComponent(
+                        searchQuery
+                    )}`
+                );
+                if (response.ok) {
+                    searchResults = await response.json();
+                } else {
+                    searchResults = [];
+                }
             }
+            setSongs(searchResults);
         } catch (error) {
             console.error("Error during search:", error);
             setSongs([]);
@@ -303,12 +360,15 @@ const Dashboard = () => {
                     >
                         Create New Playlist
                     </button>
-
                     <div className="list-group">
                         {playlists.map((playlist) => (
                             <div
                                 key={playlist.id}
-                                className="list-group-item d-flex justify-content-between align-items-center"
+                                className={`list-group-item d-flex justify-content-between align-items-center ${
+                                    selectedPlaylist?.id === playlist.id ? 'active' : ''
+                                }`}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => handlePlaylistClick(playlist)}
                             >
                                 <div>
                                     <strong>{playlist.name}</strong>
@@ -334,13 +394,22 @@ const Dashboard = () => {
                 </div>
 
                 <div className="col-md-6">
-                    <h5>All Songs</h5>
+                    <h5>
+                        {selectedPlaylist 
+                            ? `Songs in "${selectedPlaylist.name}"` 
+                            : "All Songs"
+                        }
+                    </h5>
                     <div className="mb-3">
                         <div className="input-group">
                             <input
                                 type="text"
                                 className="form-control"
-                                placeholder="Search songs by title..."
+                                placeholder={
+                                    selectedPlaylist 
+                                        ? `Search in "${selectedPlaylist.name}"...`
+                                        : "Search songs by title..."
+                                }
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyPress={(e) => {
@@ -360,7 +429,11 @@ const Dashboard = () => {
                                     className="btn btn-outline-secondary"
                                     onClick={() => {
                                         setSearchQuery("");
-                                        fetchSongs();
+                                        if (selectedPlaylist) {
+                                            fetchPlaylistSongs(selectedPlaylist.id);
+                                        } else {
+                                            setSongs(allSongs);
+                                        }
                                     }}
                                 >
                                     Clear
@@ -423,7 +496,10 @@ const Dashboard = () => {
                                     <tr>
                                         <td colSpan="5" className="text-center">
                                             <div className="alert alert-info mb-0">
-                                                No songs found.
+                                                {selectedPlaylist 
+                                                    ? `No songs found in "${selectedPlaylist.name}".`
+                                                    : "No songs found."
+                                                }
                                             </div>
                                         </td>
                                     </tr>
@@ -527,7 +603,6 @@ const Dashboard = () => {
                                         </div>
                                     </div>
 
-                                    {/* Follow/Unfollow button */}
                                     <button
                                         className={`btn btn-sm ${
                                             followStatus[user.id]
@@ -565,7 +640,11 @@ const Dashboard = () => {
                     onClose={() => {
                         setShowAddToPlaylist(false);
                         setSelectedSong(null);
-                        fetchDashboardData();
+                        if (selectedPlaylist) {
+                            fetchPlaylistSongs(selectedPlaylist.id);
+                        } else {
+                            fetchSongs();
+                        }
                     }}
                     onSuccess={handleAddToPlaylistSuccess}
                 />
