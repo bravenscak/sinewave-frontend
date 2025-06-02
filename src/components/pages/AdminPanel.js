@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchWithAuth, logout } from '../../Utils/AuthUtils';
+import { fetchWithAuth, logout } from '../../utils/AuthUtils';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const AdminPanel = () => {
