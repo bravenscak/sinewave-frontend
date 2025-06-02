@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { isAuthenticated, isAdmin } from './Utils/AuthUtils';
+import { isAuthenticated, isAdmin } from './utils/AuthUtils';
 
 import LoginForm from './components/pages/Login';
 import RegistrationForm from './components/pages/Register';
@@ -45,7 +45,7 @@ const router = createBrowserRouter([
     element: <MyPlaylists />
   },
   {
-    path: '/dashboard',
+    path: '/',
     element: <Dashboard />
   },
   {

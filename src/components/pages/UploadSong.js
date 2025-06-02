@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { fetchWithAuth, getCurrentUser, logout } from '../../Utils/AuthUtils';
+import { fetchWithAuth, getCurrentUser, logout } from '../../utils/AuthUtils';
 import '../css/UploadSong.css';
 
 const UploadSong = () => {
@@ -26,7 +26,7 @@ const UploadSong = () => {
         formData.append('file', file);
 
         try {
-          const res = await fetch('http://localhost:8080/api/users/upload', {
+          const res = await fetch('http://localhost:8081/upload', {
             method: 'POST',
             body: formData,
           });

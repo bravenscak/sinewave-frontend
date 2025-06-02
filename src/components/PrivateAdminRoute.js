@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { isAuthenticated, isAdmin } from '../Utils/AuthUtils';
+import { isAuthenticated, isAdmin } from '../utils/AuthUtils';
 
 const PrivateAdminRoute = ({ children }) => {
   if (!isAuthenticated()) {
