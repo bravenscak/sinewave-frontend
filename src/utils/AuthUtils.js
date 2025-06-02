@@ -69,41 +69,60 @@ export const refreshAccessToken = async () => {
 };
 
 export const fetchWithAuth = async (url, options = {}) => {
-    const headers = {
-        ...options.headers,
-        ...authHeader(),
-        'Content-Type': 'application/json'
+    const initialHeaders = {
+        ...options.headers, 
+        ...authHeader(),   
     };
 
-    let response = await fetch(url, {
-        ...options,
-        headers,
-        credentials: 'include'
-    });
-
-    if (response.status === 401) {
-        try {
-            await refreshAccessToken();
-            
-            response = await fetch(url, {
-                ...options,
-                headers: {
-                    ...options.headers,
-                    ...authHeader(),
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include'
-            });
-            
-            if (response.status === 401) {
-                logout();
-                return Promise.reject('Session expired. Please login again.');
-            }
-        } catch (error) {
-            logout();
-            return Promise.reject('Session expired. Please login again.');
-        }
+    if (!(options.body instanceof FormData) && !initialHeaders['Content-Type']) {
+        initialHeaders['Content-Type'] = 'application/json';
     }
 
-    return response;
+    try {
+        let response = await fetch(url, {
+            ...options,
+            headers: initialHeaders, 
+            credentials: 'include'
+        });
+
+        const isAuthEndpoint = url.includes('/api/auth/login') || url.includes('/api/auth/refresh');
+
+        if (response.status === 401 && !isAuthEndpoint) {
+            try {
+                console.log("Token expired or invalid, attempting to refresh...");
+                await refreshAccessToken(); 
+
+                const retryHeaders = {
+                    ...options.headers,
+                    ...authHeader(),
+                };
+                if (!(options.body instanceof FormData) && !retryHeaders['Content-Type']) {
+                    retryHeaders['Content-Type'] = 'application/json';
+                }
+
+                console.log("Retrying original request with new token...");
+                response = await fetch(url, {
+                    ...options,
+                    headers: retryHeaders,
+                    credentials: 'include'
+                });
+
+                if (response.status === 401) { 
+                    console.error("Still unauthorized after token refresh. Logging out.");
+                    logout();
+                    return Promise.reject(new Error('Session expired. Please login again.'));
+                }
+
+            } catch (refreshError) {
+                console.error("Token refresh failed:", refreshError);
+                logout(); 
+                return Promise.reject(new Error('Session refresh failed. Please login again.'));
+            }
+        }
+        return response;
+
+    } catch (error) {
+        console.error('Fetch error:', error.message, 'URL:', url);
+        throw error; 
+    }
 };

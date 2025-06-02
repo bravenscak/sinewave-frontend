@@ -1,21 +1,23 @@
-.login-container {
+.upload-song-container {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Align to top for longer forms */
     min-height: 100vh;
     font-family: Arial, sans-serif;
+    padding-top: 40px; /* Add some padding at the top */
+    padding-bottom: 40px;
 }
 
-.login-form-container {
+.upload-song-form-container {
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
     padding: 30px;
     background-color: #e6e6e6;
     border-radius: 4px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
+.upload-song-form-container h1 {
     text-align: center;
     margin-bottom: 30px;
     color: #333;
@@ -25,13 +27,20 @@ h1 {
     margin-bottom: 20px;
 }
 
-label {
+.form-group label {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
 }
 
-input {
+.form-group label .required {
+    color: red;
+    margin-left: 4px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="file"] {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
@@ -40,21 +49,11 @@ input {
     box-sizing: border-box;
 }
 
-input.input-error {
-    border-color: #dc3545;
-}
-
-.error-message {
-    color: #dc3545;
-    font-size: 14px;
-    margin-top: 5px;
-}
-
-.login-button {
+.upload-button {
     display: block;
-    width: auto;
+    width: 100%; /* Make button full width */
     padding: 12px 24px;
-    margin: 0 auto;
+    margin-top: 10px; /* Add some margin above button */
     background-color: #333;
     color: white;
     border: none;
@@ -64,11 +63,25 @@ input.input-error {
     transition: background-color 0.3s;
 }
 
-.login-button:hover {
+.upload-button:hover {
     background-color: #555;
 }
 
-.login-error-message {
+.upload-button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.error-message {
     background-color: #f8d7da;
     color: #721c24;
     padding: 10px;
@@ -76,27 +89,3 @@ input.input-error {
     margin-bottom: 20px;
     text-align: center;
 }
-
-.input-error {
-    border-color: #dc3545 !important;
-}
-
-.error-message {
-    color: #dc3545;
-    font-size: 14px;
-    margin-top: 5px;
-}
-
-button:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-.login-success-message {
-    background-color: #dff0d8;
-    color: #3c763d;
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-    text-align: center;
-  }
