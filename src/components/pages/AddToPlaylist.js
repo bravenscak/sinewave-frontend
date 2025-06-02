@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchWithAuth } from '../../Utils/AuthUtils';
+import { fetchWithAuth } from '../../utils/AuthUtils';
 import '../css/AddToPlaylist.css';
 import CreatePlaylist from './CreatePlaylist';
 

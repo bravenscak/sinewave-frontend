@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { fetchWithAuth, getCurrentUser, logout } from '../../Utils/AuthUtils';
+import { fetchWithAuth, getCurrentUser, logout } from '../../utils/AuthUtils';
 import '../css/UploadSong.css';
 
 const UploadSong = () => {

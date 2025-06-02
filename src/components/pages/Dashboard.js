@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { fetchWithAuth, getCurrentUser, logout } from "../../Utils/AuthUtils";
+import { fetchWithAuth, getCurrentUser, logout } from "../../utils/AuthUtils";
 import CreatePlaylist from "./CreatePlaylist";
 import AddToPlaylist from "./AddToPlaylist";
 import "bootstrap/dist/css/bootstrap.min.css";

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchWithAuth, logout } from '../../Utils/AuthUtils';
+import { fetchWithAuth, logout } from '../../utils/AuthUtils';
 import '../css/UserWindow.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import avatar from '../img/default-avatar.webp';
