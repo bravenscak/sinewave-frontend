@@ -3,6 +3,7 @@ import { fetchWithAuth, getCurrentUser, logout } from '../../utils/AuthUtils';
 
 import CreatePlaylist from './CreatePlaylist';
 import '../css/ProfileDetails.css';
+import { Link } from 'react-router-dom';
 
 const ProfileDetails = () => {
   const [userData, setUserData] = useState(null);
@@ -84,8 +85,8 @@ const ProfileDetails = () => {
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <h1>SINEWAVE</h1>
-        <button onClick={handleLogout} className="logout-button">Logout</button>
+        <h1>My profile details</h1>
+        <Link to="/dashboard" className="btn btn-primary">Return</Link>
       </header>
       
       <div className="dashboard-content">
@@ -124,7 +125,7 @@ const ProfileDetails = () => {
             </div>
           )}
         </div>
-      </div>
+        
       
       {showCreatePlaylist && (
         <CreatePlaylist 
@@ -132,9 +133,8 @@ const ProfileDetails = () => {
           onClose={() => setShowCreatePlaylist(false)}
         />
       )}
-          <p>Liked songs count:</p>
-          <p>My playlists count:</p>
-        </div>
+      </div>
+    </div>
   );
 };
 

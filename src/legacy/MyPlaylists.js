@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { fetchWithAuth, getCurrentUser, logout } from '../../utils/AuthUtils';
-import '../css/MySongs.css';
+import { fetchWithAuth, getCurrentUser, logout } from '../utils/AuthUtils';
+import '../css/MyPlaylists.css';
 
-const MySongs = () => {
+const MyPlaylists = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,7 +20,7 @@ const MySongs = () => {
   
   const fetchUserData = async () => {
     try {
-      const response = await fetchWithAuth(`http://localhost:8080/api/user/songs`);
+      const response = await fetchWithAuth(`http://localhost:8080/api/user/playlists`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch user data');
@@ -56,49 +56,16 @@ const MySongs = () => {
       
       <div className="dashboard-content">
         <div className="user-profile">
-          <h2>Songs you uploaded</h2>
+          <h2>Your playlists</h2>
           <div className="user-details">
           <table>
     <thead>
       <tr>
-        <th>Song Name</th>
-        <th>Author Name</th>
-        <th>Date Uploaded</th>
+        <th>Playlist Name</th>
+        <th>Date Created</th>
         <th>Length</th>
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <td>To France</td>
-        <td>Mike Oldfield</td>
-        <td>2022-08-15</td>
-        <td>2 min 30 sec</td>
-      </tr>
-      <tr>
-      <td>Shadow On The Wall</td>
-        <td>Mike Oldfield</td>
-        <td>2021-08-15</td>
-        <td>2 min</td>
-      </tr>
-      <tr>
-      <td>Obična Ljuibavna Pjesma</td>
-        <td>Aerodrom</td>
-        <td>2023-02-02</td>
-        <td>1 min 30 sec</td>
-      </tr>
-      <tr>
-      <td>Forever Young</td>
-        <td>Alphaville</td>
-        <td>2022-08-15</td>
-        <td>2 min 30 sec</td>
-      </tr>
-      <tr>
-      <td>Sounds Like A Melody</td>
-        <td>Alphaville</td>
-        <td>2022-08-15</td>
-        <td>3 min 30 sec</td>
-      </tr>
-    </tbody>
   </table>
           </div>
         </div>
@@ -107,4 +74,4 @@ const MySongs = () => {
   );
 };
 
-export default MySongs;
+export default MyPlaylists;
