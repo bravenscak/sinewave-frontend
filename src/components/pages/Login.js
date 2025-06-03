@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../css/Login.css';
+import bgImage from '../img/5af4b12d-098e-4050-9de0-44cc5855d855.png';
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -89,9 +90,19 @@ const LoginForm = () => {
 };
 
   return (
+    <div
+      className="d-flex flex-column justify-content-center align-items-center"
+      style={{
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        height: '100vh',
+        width: '100vw',
+        
+      }}
+    >
     <div className="login-container">
       <div className="login-form-container">
-        <h1>SINEWAVE</h1>
         
         {loginError && <div className="login-error-message">{loginError}</div>}
         {loginSuccess && <div className="login-success-message">Login successful!</div>}
@@ -136,8 +147,14 @@ const LoginForm = () => {
               {isLoading ? 'Logging in...' : 'Login'}
             </button>
           </div>
+          <div className="form-group">
+            <p className="register-link">
+              Don't have an account? <a href="/register">Register here</a>
+            </p>
+          </div>
         </form>
       </div>
+    </div>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../css/Register.css';
+import bgImage from '../img/5af4b12d-098e-4050-9de0-44cc5855d855.png';
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -116,9 +117,20 @@ const RegistrationForm = () => {
   };
 
   return (
+    <div
+      className="d-flex flex-column justify-content-center align-items-center"
+      style={{
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        height: '100vh',
+        width: '100vw',
+        
+      }}
+    >
+
     <div className="register-container">
       <div className="register-form-container">
-        <h1>SINEWAVE</h1>
         
         {registrationError && <div className="registration-error-message">{registrationError}</div>}
         {registrationSuccess && <div className="registration-success-message">Registration successful! Redirecting...</div>}
@@ -170,7 +182,7 @@ const RegistrationForm = () => {
           </div>
           
           <div className="form-group">
-            <label htmlFor="email">E - mail</label>
+            <label htmlFor="email">E-Mail</label>
             <input
               type="email"
               id="email"
@@ -207,9 +219,15 @@ const RegistrationForm = () => {
             >
               {isLoading ? 'Registering...' : 'Register'}
             </button>
+            <div className="form-group">
+            <p className="register-link">
+              Already have an account? <a href="/login">Login here</a>
+            </p>
+          </div>
           </div>
         </form>
       </div>
+    </div>
     </div>
   );
 };
