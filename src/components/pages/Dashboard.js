@@ -22,6 +22,9 @@ const Dashboard = () => {
   const [showAddToPlaylist, setShowAddToPlaylist] = useState(false);
   const [selectedSong, setSelectedSong] = useState(null);
   const [followStatus, setFollowStatus] = useState({});
+  const [songId, setSongId] = useState(null);
+    const [url, setUrl] = useState("");
+    const audioRef = React.useRef(null);
 
   const fetchSongs = async () => {
     try {
@@ -316,11 +319,11 @@ const Dashboard = () => {
   };
 
   // todo fix audio streaming
-//   const handleSongStream = () => {
-//     if (songId) {
-//       setUrl(`http://localhost:8080/api/songs/stream/${songId}`);
-//     }
-//   };
+const handleSongStream = () => {
+if (songId) {
+setUrl(`http://localhost:8080/api/songs/stream/${songId}`);
+}
+};
 
   if (loading) {
     return (
@@ -481,8 +484,7 @@ const Dashboard = () => {
                         className="btn btn-primary btn-sm me-1"
                         title="Play"
                         onClick={() => {
-                          // todo Placeholder for play functionality
-                          console.log(`Playing song: ${song.title}`);
+                            setSongId(song.id);
                         }}
                       >
                         ▶️
@@ -656,31 +658,38 @@ const Dashboard = () => {
 
       <footer className="fixed-bottom bg-light border-top py-2 px-4 d-flex justify-content-between align-items-center">
         <div>
-          <strong>Now Playing:</strong> <i>none - none</i>
+          <strong>Now Playing:</strong>{" "}
+          {selectedSong ? (
+            <i>
+              {selectedSong.title || selectedSong.name} - {selectedSong.artistName || "Unknown Artist"}
+            </i>
+          ) : (
+            <span>No song playing</span>
+          )}
         </div>
-        {/* todo Placeholder for audio player
-        <div>
-          <ReactPlayer
-            url={url}
-            controls={true}
-            width="100%"
-            height="50px"
-            config={{
-              file: {
-                attributes: {
-                  controlsList: "nodownload",
-                },
-              },
-            }}
-            onError={(e) => console.error("Player error:", e)}
-          />
-        </div> */}
+        
+        {url && (
+        <ReactPlayer
+          url={url}
+          controls={true}
+          width="100%"
+          height="50px"
+          config={{
+            file: {
+              attributes: {
+                controlsList: 'nodownload' // Optional: disable download button
+              }
+            }
+          }}
+          onError={(e) => console.error("Player error:", e)}
+        />
+      )}
 
-        <div className="d-flex align-items-center gap-2">
+        {/* <div className="d-flex align-items-center gap-2">
           <button className="btn btn-outline-secondary btn-sm">⏮️</button>
           <button className="btn btn-primary btn-sm">▶️</button>
           <button className="btn btn-outline-secondary btn-sm">⏭️</button>
-        </div>
+        </div> */}
 
         <div className="d-flex align-items-center">
           <label className="me-2 mb-0">🔊</label>
