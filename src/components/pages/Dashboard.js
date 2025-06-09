@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { fetchWithAuth, getCurrentUser, logout } from "../../utils/AuthUtils";
 import CreatePlaylist from "./CreatePlaylist";
@@ -21,6 +21,35 @@ const Dashboard = () => {
     const [showAddToPlaylist, setShowAddToPlaylist] = useState(false);
     const [selectedSong, setSelectedSong] = useState(null);
     const [followStatus, setFollowStatus] = useState({});
+
+    const [currentPlayingSongId, setCurrentPlayingSongId] = useState(null);
+    const [currentSongTitle, setCurrentSongTitle] = useState("none - none");
+    const audioPlayerRef = useRef(null);
+
+    const handlePlaySong = (song) => {
+        if (currentPlayingSongId === song.id) {
+            if (audioPlayerRef.current) {
+                if (audioPlayerRef.current.paused) {
+                    audioPlayerRef.current.play();
+                } else {
+                    audioPlayerRef.current.pause();
+                }
+            }
+        } else {
+            setCurrentPlayingSongId(song.id);
+            setCurrentSongTitle(`${song.title} - ${song.artistName || 'Unknown Artist'}`);
+        }
+    };
+
+    useEffect(() => {
+        if (currentPlayingSongId && audioPlayerRef.current) {
+            audioPlayerRef.current.src = `http://localhost:8080/api/songs/stream/${currentPlayingSongId}`;
+            audioPlayerRef.current.load(); 
+            audioPlayerRef.current.play().catch(error => {
+                console.error("Error playing audio:", error);
+            });
+        }
+    }, [currentPlayingSongId]);
 
     const fetchSongs = async () => {
         try {
@@ -456,7 +485,12 @@ const Dashboard = () => {
                             <tbody>
                                 {songs.map((song) => (
                                     <tr key={song.id}>
-                                        <td>{song.title}</td>
+                                        <td 
+                                        style={{ cursor: 'pointer', color: currentPlayingSongId === song.id ? 'blue' : 'inherit' }} 
+                                        onClick={() => handlePlaySong(song)}
+                                        >
+                                        {song.title}
+                                        </td>
                                         <td>
                                             {song.artistName ||
                                                 "Unknown Artist"}
@@ -472,6 +506,16 @@ const Dashboard = () => {
                                                       .toString()
                                                       .padStart(2, "0")}`
                                                 : "N/A"}
+                                        </td>
+                                        <td>
+                                        {/* Play button */}
+                                        <button
+                                            className={`btn btn-sm me-1 ${currentPlayingSongId === song.id && audioPlayerRef.current && !audioPlayerRef.current.paused ? 'btn-warning' : 'btn-success'}`}
+                                            title={currentPlayingSongId === song.id && audioPlayerRef.current && !audioPlayerRef.current.paused ? "Pause" : "Play"}
+                                            onClick={() => handlePlaySong(song)}
+                                        >
+                                            {currentPlayingSongId === song.id && audioPlayerRef.current && !audioPlayerRef.current.paused ? '❚❚' : '▶'}
+                                        </button>
                                         </td>
                                         <td>
                                             <button
@@ -652,22 +696,25 @@ const Dashboard = () => {
 
             <footer className="fixed-bottom bg-light border-top py-2 px-4 d-flex justify-content-between align-items-center">
                 <div>
-                    <strong>Now Playing:</strong> <i>none - none</i>
+                    <strong>Now Playing:</strong> <i>{currentSongTitle}</i>
                 </div>
 
-                <div className="d-flex align-items-center gap-2">
-                    <button className="btn btn-outline-secondary btn-sm">
-                        ⏮️
-                    </button>
-                    <button className="btn btn-primary btn-sm">▶️</button>
-                    <button className="btn btn-outline-secondary btn-sm">
-                        ⏭️
-                    </button>
-                </div>
-
-                <div className="d-flex align-items-center">
-                    <label className="me-2 mb-0">🔊</label>
-                    <input type="range" min="0" max="100" defaultValue="50" />
+                <div className="flex-grow-1 mx-3">
+                    <audio
+                        ref={audioPlayerRef}
+                        controls
+                        style={{ width: '100%' }}
+                        onEnded={() => {
+                            setCurrentPlayingSongId(null);
+                            setCurrentSongTitle("none - none");
+                        }}
+                        onError={(e) => {
+                            console.error("Audio player error:", e);
+                            setCurrentSongTitle("Error loading song");
+                        }}
+                    >
+                        Your browser does not support the audio element.
+                    </audio>
                 </div>
             </footer>
         </div>
