@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchWithAuth, getCurrentUser } from '../../utils/AuthUtils'; 
 import '../css/UploadSong.css'; 
+import bgImage from '../img/5af4b12d-098e-4050-9de0-44cc5855d855.png';
 
 const UploadSong = () => {
   const [title, setTitle] = useState('');
@@ -70,6 +71,17 @@ const UploadSong = () => {
   };
 
   return (
+    <div
+      className="d-flex flex-column justify-content-center align-items-center"
+      style={{
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        height: '100vh',
+        width: '100vw',
+        
+      }}
+    >
     <div className="upload-song-container">
       <div className="upload-song-form-container">
         <h1>Upload New Song</h1>
@@ -97,6 +109,7 @@ const UploadSong = () => {
           </button>
         </form>
       </div>
+    </div>
     </div>
   );
 };

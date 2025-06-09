@@ -5,8 +5,6 @@ import { isAuthenticated, isAdmin } from './utils/AuthUtils';
 import LoginForm from './components/pages/Login';
 import RegistrationForm from './components/pages/Register';
 import LandingPage from './components/pages/LangingPage';
-import MyPlaylists from './components/pages/MyPlaylists';
-import MySongs from './components/pages/MySongs';
 import UploadSong from './components/pages/UploadSong';
 import ProfileDetails from './components/pages/ProfileDetails';
 import Dashboard from './components/pages/Dashboard';
@@ -33,16 +31,12 @@ const router = createBrowserRouter([
     element: isAuthenticated() ? (isAdmin() ? <AdminPanel /> : <Dashboard />) : <RegistrationForm />
   },
   {
+    path: '/dashboard',
+    element: <Dashboard />
+  },
+  {
     path: '/profiledetails',
     element: <ProfileDetails />
-  },
-  {
-    path: '/mysongs',
-    element: <MySongs />
-  },
-  {
-    path: '/myplaylists',
-    element: <MyPlaylists />
   },
   {
     path: '/',

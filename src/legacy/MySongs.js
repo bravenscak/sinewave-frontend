@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { fetchWithAuth, getCurrentUser, logout } from '../../utils/AuthUtils';
-import '../css/MyPlaylists.css';
+import { fetchWithAuth, getCurrentUser, logout } from '../utils/AuthUtils';
+import '../css/MySongs.css';
 
-const MyPlaylists = () => {
+const MySongs = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,7 +20,7 @@ const MyPlaylists = () => {
   
   const fetchUserData = async () => {
     try {
-      const response = await fetchWithAuth(`http://localhost:8080/api/user/playlists`);
+      const response = await fetchWithAuth(`http://localhost:8080/api/user/songs`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch user data');
@@ -56,43 +56,17 @@ const MyPlaylists = () => {
       
       <div className="dashboard-content">
         <div className="user-profile">
-          <h2>Your playlists</h2>
+          <h2>Songs you uploaded</h2>
           <div className="user-details">
           <table>
     <thead>
       <tr>
-        <th>Playlist Name</th>
-        <th>Date Created</th>
+        <th>Song Name</th>
+        <th>Author Name</th>
+        <th>Date Uploaded</th>
         <th>Length</th>
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <td>Chill</td>
-        <td>2023-09-15</td>
-        <td>1 hr 20 min</td>
-      </tr>
-      <tr>
-        <td>Workout</td>
-        <td>2025-01-05</td>
-        <td>55 min</td>
-      </tr>
-      <tr>
-        <td>Throwback SOngs</td>
-        <td>2023-07-22</td>
-        <td>2 hr 10 min</td>
-      </tr>
-      <tr>
-        <td>Focus</td>
-        <td>2025-02-14</td>
-        <td>1 hr 5 min</td>
-      </tr>
-      <tr>
-        <td>Night Drive</td>
-        <td>2024-11-30</td>
-        <td>45 min</td>
-      </tr>
-    </tbody>
   </table>
           </div>
         </div>
@@ -101,4 +75,4 @@ const MyPlaylists = () => {
   );
 };
 
-export default MyPlaylists;
+export default MySongs;
