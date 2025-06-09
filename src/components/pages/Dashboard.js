@@ -5,7 +5,6 @@ import CreatePlaylist from "./CreatePlaylist";
 import AddToPlaylist from "./AddToPlaylist";
 import "bootstrap/dist/css/bootstrap.min.css";
 import avatar from "../img/default-avatar.webp";
-import ReactPlayer from "react-player";
 
 const Dashboard = () => {
     const [playlists, setPlaylists] = useState([]);
@@ -344,12 +343,6 @@ const Dashboard = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
-  // todo fix audio streaming
-const handleSongStream = () => {
-if (songId) {
-setUrl(`http://localhost:8080/api/songs/stream/${songId}`);
-}
-};
 
   if (loading) {
     return (
