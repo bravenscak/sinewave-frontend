@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { fetchWithAuth, getCurrentUser, logout } from "../../utils/AuthUtils";
 import CreatePlaylist from "./CreatePlaylist";
@@ -8,23 +8,49 @@ import avatar from "../img/default-avatar.webp";
 import ReactPlayer from "react-player";
 
 const Dashboard = () => {
-  const [playlists, setPlaylists] = useState([]);
-  const [songs, setSongs] = useState([]);
-  const [allSongs, setAllSongs] = useState([]);
-  const [selectedPlaylist, setSelectedPlaylist] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [userData, setUserData] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [userSearchQuery, setUserSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
-  const [showAddToPlaylist, setShowAddToPlaylist] = useState(false);
-  const [selectedSong, setSelectedSong] = useState(null);
-  const [followStatus, setFollowStatus] = useState({});
-  const [songId, setSongId] = useState(null);
-    const [url, setUrl] = useState("");
-    const audioRef = React.useRef(null);
+    const [playlists, setPlaylists] = useState([]);
+    const [songs, setSongs] = useState([]);
+    const [allSongs, setAllSongs] = useState([]); 
+    const [selectedPlaylist, setSelectedPlaylist] = useState(null); 
+    const [users, setUsers] = useState([]);
+    const [userData, setUserData] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [userSearchQuery, setUserSearchQuery] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
+    const [showAddToPlaylist, setShowAddToPlaylist] = useState(false);
+    const [selectedSong, setSelectedSong] = useState(null);
+    const [followStatus, setFollowStatus] = useState({});
+
+    const [currentPlayingSongId, setCurrentPlayingSongId] = useState(null);
+    const [currentSongTitle, setCurrentSongTitle] = useState("none - none");
+    const audioPlayerRef = useRef(null);
+
+    const handlePlaySong = (song) => {
+        if (currentPlayingSongId === song.id) {
+            if (audioPlayerRef.current) {
+                if (audioPlayerRef.current.paused) {
+                    audioPlayerRef.current.play();
+                } else {
+                    audioPlayerRef.current.pause();
+                }
+            }
+        } else {
+            setCurrentPlayingSongId(song.id);
+            setCurrentSongTitle(`${song.title} - ${song.artistName || 'Unknown Artist'}`);
+        }
+    };
+
+    useEffect(() => {
+        if (currentPlayingSongId && audioPlayerRef.current) {
+            audioPlayerRef.current.src = `http://localhost:8080/api/songs/stream/${currentPlayingSongId}`;
+            audioPlayerRef.current.load(); 
+            audioPlayerRef.current.play().catch(error => {
+                console.error("Error playing audio:", error);
+            });
+        }
+    }, [currentPlayingSongId]);
 
   const fetchSongs = async () => {
     try {
@@ -440,73 +466,87 @@ setUrl(`http://localhost:8080/api/songs/stream/${songId}`);
             </div>
           </div>
 
-          <div className="table-responsive">
-            <table className="table table-striped">
-              <thead>
-                <tr>
-                  <th>Song</th>
-                  <th>Artist</th>
-                  <th>Genre</th>
-                  <th>Duration</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {songs.map((song) => (
-                  <tr key={song.id}>
-                    <td>{song.title}</td>
-                    <td>{song.artistName || "Unknown Artist"}</td>
-                    <td>{song.genreName || "Unknown Genre"}</td>
-                    <td>
-                      {song.duration
-                        ? `${Math.floor(song.duration / 60)}:${(
-                            song.duration % 60
-                          )
-                            .toString()
-                            .padStart(2, "0")}`
-                        : "N/A"}
-                    </td>
-                    <td>
-                      <button
-                        className="btn btn-outline-danger btn-sm"
-                        title="Like"
-                      >
-                        ♥
-                      </button>
-                      <button
-                        className="btn btn-primary btn-sm me-1"
-                        title="Add to playlist"
-                        onClick={() => handleAddToPlaylist(song)}
-                      >
-                        ➕
-                      </button>
-                      <button
-                        className="btn btn-primary btn-sm me-1"
-                        title="Play"
-                        onClick={() => {
-                            setSongId(song.id);
-                        }}
-                      >
-                        ▶️
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {songs.length === 0 && (
-                  <tr>
-                    <td colSpan="5" className="text-center">
-                      <div className="alert alert-info mb-0">
-                        {selectedPlaylist
-                          ? `No songs found in "${selectedPlaylist.name}".`
-                          : "No songs found."}
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                    <div className="table-responsive">
+                        <table className="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Song</th>
+                                    <th>Artist</th>
+                                    <th>Genre</th>
+                                    <th>Duration</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {songs.map((song) => (
+                                    <tr key={song.id}>
+                                        <td 
+                                        style={{ cursor: 'pointer', color: currentPlayingSongId === song.id ? 'blue' : 'inherit' }} 
+                                        onClick={() => handlePlaySong(song)}
+                                        >
+                                        {song.title}
+                                        </td>
+                                        <td>
+                                            {song.artistName ||
+                                                "Unknown Artist"}
+                                        </td>
+                                        <td>
+                                            {song.genreName || "Unknown Genre"}
+                                        </td>
+                                        <td>
+                                            {song.duration
+                                                ? `${Math.floor(
+                                                      song.duration / 60
+                                                  )}:${(song.duration % 60)
+                                                      .toString()
+                                                      .padStart(2, "0")}`
+                                                : "N/A"}
+                                        </td>
+                                        <td>
+                                        {/* Play button */}
+                                        <button
+                                            className={`btn btn-sm me-1 ${currentPlayingSongId === song.id && audioPlayerRef.current && !audioPlayerRef.current.paused ? 'btn-warning' : 'btn-success'}`}
+                                            title={currentPlayingSongId === song.id && audioPlayerRef.current && !audioPlayerRef.current.paused ? "Pause" : "Play"}
+                                            onClick={() => handlePlaySong(song)}
+                                        >
+                                            {currentPlayingSongId === song.id && audioPlayerRef.current && !audioPlayerRef.current.paused ? '❚❚' : '▶'}
+                                        </button>
+                                        </td>
+                                        <td>
+                                            <button
+                                                className="btn btn-primary btn-sm me-1"
+                                                title="Add to playlist"
+                                                onClick={() =>
+                                                    handleAddToPlaylist(song)
+                                                }
+                                            >
+                                                ➕
+                                            </button>
+                                            <button
+                                                className="btn btn-outline-danger btn-sm"
+                                                title="Like"
+                                            >
+                                                ♥
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {songs.length === 0 && (
+                                    <tr>
+                                        <td colSpan="5" className="text-center">
+                                            <div className="alert alert-info mb-0">
+                                                {selectedPlaylist 
+                                                    ? `No songs found in "${selectedPlaylist.name}".`
+                                                    : "No songs found."
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
         <div className="col-md-3">
           <div className="d-flex justify-content-between align-items-center mb-3">
@@ -656,48 +696,31 @@ setUrl(`http://localhost:8080/api/songs/stream/${songId}`);
         />
       )}
 
-      <footer className="fixed-bottom bg-light border-top py-2 px-4 d-flex justify-content-between align-items-center">
-        <div>
-          <strong>Now Playing:</strong>{" "}
-          {selectedSong ? (
-            <i>
-              {selectedSong.title || selectedSong.name} - {selectedSong.artistName || "Unknown Artist"}
-            </i>
-          ) : (
-            <span>No song playing</span>
-          )}
-        </div>
-        
-        {url && (
-        <ReactPlayer
-          url={url}
-          controls={true}
-          width="100%"
-          height="50px"
-          config={{
-            file: {
-              attributes: {
-                controlsList: 'nodownload' // Optional: disable download button
-              }
-            }
-          }}
-          onError={(e) => console.error("Player error:", e)}
-        />
-      )}
+            <footer className="fixed-bottom bg-light border-top py-2 px-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>Now Playing:</strong> <i>{currentSongTitle}</i>
+                </div>
 
-        {/* <div className="d-flex align-items-center gap-2">
-          <button className="btn btn-outline-secondary btn-sm">⏮️</button>
-          <button className="btn btn-primary btn-sm">▶️</button>
-          <button className="btn btn-outline-secondary btn-sm">⏭️</button>
-        </div> */}
-
-        <div className="d-flex align-items-center">
-          <label className="me-2 mb-0">🔊</label>
-          <input type="range" min="0" max="100" defaultValue="50" />
+                <div className="flex-grow-1 mx-3">
+                    <audio
+                        ref={audioPlayerRef}
+                        controls
+                        style={{ width: '100%' }}
+                        onEnded={() => {
+                            setCurrentPlayingSongId(null);
+                            setCurrentSongTitle("none - none");
+                        }}
+                        onError={(e) => {
+                            console.error("Audio player error:", e);
+                            setCurrentSongTitle("Error loading song");
+                        }}
+                    >
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </footer>
         </div>
-      </footer>
-    </div>
-  );
+    );
 };
 
 export default Dashboard;
