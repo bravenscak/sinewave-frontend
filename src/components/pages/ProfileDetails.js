@@ -11,6 +11,7 @@ const ProfileDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   
   useEffect(() => {
     const user = getCurrentUser();
@@ -86,7 +87,7 @@ const ProfileDetails = () => {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1>My profile details</h1>
-        <Link to="/dashboard" className="btn btn-primary">Return</Link>
+        <Link to="/dashboard" className="btn btn-primary">&lt; Return</Link>
       </header>
       
       <div className="dashboard-content">
@@ -97,7 +98,6 @@ const ProfileDetails = () => {
             <p><strong>Email:</strong> {userData.email}</p>
           </div>
         </div>
-        
         <div className="dashboard-section">
           <div className="section-header">
             <h3>Your Playlists</h3>
@@ -134,9 +134,61 @@ const ProfileDetails = () => {
         />
       )}
       </div>
+      <footer className="dashboard-footer">
+        <p className="footer-text">
+          If you wish to delete your profile, click here:
+        </p>
+        <button onClick={() => setShowDeleteModal(true)} className="btn btn-danger">
+          Delete Profile
+        </button>
+      </footer>
+
+      {showDeleteModal && (
+        <div className="modal-overlay" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div className="modal-content" style={{
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+            maxWidth: '400px',
+            width: '90%',
+            textAlign: 'center'
+          }}>
+            <h3 style={{ color: '#dc3545', marginBottom: '20px' }}>Warning!</h3>
+            <p style={{ marginBottom: '20px', fontSize: '16px' }}>
+              This action is irreversible. Are you sure you want to delete your profile?
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+              <button
+                className="btn btn-danger"
+                onClick={handleLogout}
+                style={{ width: '120px' }}
+              >
+                Yes, I'm sure
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowDeleteModal(false)}
+                style={{ width: '120px' }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
 
 export default ProfileDetails;
