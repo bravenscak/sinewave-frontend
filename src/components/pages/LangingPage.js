@@ -26,7 +26,32 @@ const LandingPage = () => {
           Register
         </Link>
       </div>
+      <div className="d-flex flex-column align-items-center" style={{ 
+      position: 'fixed', 
+      bottom: '20px', 
+      width: '100%',
+      textAlign: 'center'
+    }}>
+      <p style={{ 
+        color: 'white', 
+        textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+        marginBottom: '10px'
+      }}>
+        You can download our mobile app here:
+      </p>
+      <button 
+        className="btn btn-light" 
+        style={{
+          padding: '8px 20px',
+          borderRadius: '20px',
+          boxShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+        }}
+      >
+        Click here
+      </button>
     </div>
+    </div>
+    
   );
 };
 
