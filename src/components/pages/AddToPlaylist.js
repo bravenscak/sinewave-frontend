@@ -19,7 +19,7 @@ const AddToPlaylist = ({ songId, songName, onClose, onSuccess }) => {
   const fetchUserPlaylists = async () => {
     try {
       setLoading(true);
-      const response = await fetchWithAuth('http://localhost:8080/api/playlists/user');
+      const response = await fetchWithAuth('/api/playlists/user');
       
       if (response.ok) {
         const data = await response.json();
@@ -53,7 +53,7 @@ const AddToPlaylist = ({ songId, songName, onClose, onSuccess }) => {
       setIsAdding(true);
       setError(null);
       
-      const response = await fetchWithAuth('http://localhost:8080/api/playlists/songs', {
+      const response = await fetchWithAuth('/api/playlists/songs', {
         method: 'POST',
         body: JSON.stringify({
           playlistId: selectedPlaylistId,

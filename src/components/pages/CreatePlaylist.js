@@ -12,6 +12,8 @@ const CreatePlaylist = ({ onPlaylistCreated, onClose }) => {
   const [createError, setCreateError] = useState('');
   const [createSuccess, setCreateSuccess] = useState(false);
 
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setPlaylistData({
@@ -56,7 +58,7 @@ const CreatePlaylist = ({ onPlaylistCreated, onClose }) => {
           throw new Error('You must be logged in to create a playlist');
         }
         
-        const response = await fetch('http://localhost:8080/api/playlists', {
+        const response = await fetch(`${API_BASE_URL}/api/playlists`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

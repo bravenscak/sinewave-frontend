@@ -16,6 +16,8 @@ const RegistrationForm = () => {
   const [registrationError, setRegistrationError] = useState('');
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -68,7 +70,7 @@ const RegistrationForm = () => {
           password: formData.password
         };
         
-        const response = await fetch('http://localhost:8080/api/auth/register', {
+        const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

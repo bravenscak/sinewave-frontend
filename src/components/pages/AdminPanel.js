@@ -22,7 +22,7 @@ const AdminPanel = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetchWithAuth('http://localhost:8080/api/admin/songs');
+      const response = await fetchWithAuth('/api/admin/songs');
       if (response.ok) {
         const data = await response.json();
         setSongs(data);
@@ -40,7 +40,7 @@ const AdminPanel = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetchWithAuth('http://localhost:8080/api/admin/users');
+      const response = await fetchWithAuth('/api/admin/users');
       if (response.ok) {
         const data = await response.json();
         setUsers(data);
@@ -60,7 +60,7 @@ const AdminPanel = () => {
     }
 
     try {
-      const response = await fetchWithAuth(`http://localhost:8080/api/admin/songs/${songId}`, {
+      const response = await fetchWithAuth(`/api/admin/songs/${songId}`, {
         method: 'DELETE'
       });
       
@@ -80,7 +80,7 @@ const AdminPanel = () => {
     }
 
     try {
-      const response = await fetchWithAuth(`http://localhost:8080/api/admin/users/${userId}`, {
+      const response = await fetchWithAuth(`/api/admin/users/${userId}`, {
         method: 'DELETE'
       });
       

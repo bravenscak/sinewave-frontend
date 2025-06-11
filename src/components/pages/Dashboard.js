@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { fetchWithAuth, getCurrentUser, logout } from "../../utils/AuthUtils";
 import CreatePlaylist from "./CreatePlaylist";
 import AddToPlaylist from "./AddToPlaylist";
 import "bootstrap/dist/css/bootstrap.min.css";
 import avatar from "../img/default-avatar.webp";
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 const Dashboard = () => {
     const [playlists, setPlaylists] = useState([]);
@@ -27,6 +29,7 @@ const Dashboard = () => {
     const audioPlayerRef = useRef(null);
 
     const handlePlaySong = (song) => {
+        console.log("Playing song:", song); 
         if (currentPlayingSongId === song.id) {
             if (audioPlayerRef.current) {
                 if (audioPlayerRef.current.paused) {
@@ -43,18 +46,24 @@ const Dashboard = () => {
 
     useEffect(() => {
         if (currentPlayingSongId && audioPlayerRef.current) {
-            audioPlayerRef.current.src = `http://localhost:8080/api/songs/stream/${currentPlayingSongId}`;
-            audioPlayerRef.current.load(); 
+            const streamUrl = `${API_BASE_URL}/api/songs/stream/${currentPlayingSongId}`;
+            console.log("Setting audio source to:", streamUrl);
+
+            audioPlayerRef.current.src = streamUrl;
+            audioPlayerRef.current.load();
             audioPlayerRef.current.play().catch(error => {
                 console.error("Error playing audio:", error);
             });
+        } else if (!currentPlayingSongId && audioPlayerRef.current) {
+            audioPlayerRef.current.pause();
+            audioPlayerRef.current.src = "";
         }
     }, [currentPlayingSongId]);
 
   const fetchSongs = async () => {
     try {
       const songsResponse = await fetchWithAuth(
-        "http://localhost:8080/api/songs"
+        "/api/songs"
       );
       if (songsResponse.ok) {
         const songsData = await songsResponse.json();
@@ -98,7 +107,7 @@ const Dashboard = () => {
   const fetchPlaylistSongs = async (playlistId) => {
     try {
       const response = await fetchWithAuth(
-        `http://localhost:8080/api/playlists/${playlistId}/songs`
+        `/api/playlists/${playlistId}/songs`
       );
       if (response.ok) {
         const playlistSongs = await response.json();
@@ -136,8 +145,8 @@ const Dashboard = () => {
   const fetchUsers = async () => {
     try {
       const [usersResponse, currentUserFollowing] = await Promise.all([
-        fetchWithAuth("http://localhost:8080/api/users"),
-        fetchWithAuth("http://localhost:8080/api/users/friends/following"),
+        fetchWithAuth("/api/users"),
+        fetchWithAuth("/api/users/friends/following"),
       ]);
 
       if (usersResponse.ok && currentUserFollowing.ok) {
@@ -171,35 +180,42 @@ const Dashboard = () => {
   };
 
   const toggleFollow = async (userId) => {
-    try {
-      const isFollowing = followStatus[userId];
-      const endpoint = isFollowing
-        ? `http://localhost:8080/api/users/friends/unfollow/${userId}`
-        : `http://localhost:8080/api/users/friends/follow/${userId}`;
+        try {
+            const isFollowing = followStatus[userId];
 
-      const method = isFollowing ? "DELETE" : "POST";
+            const relativeEndpoint = isFollowing
+                ? `/api/users/friends/unfollow/${userId}`
+                : `/api/users/friends/follow/${userId}`;
 
-      const response = await fetchWithAuth(endpoint, {
-        method,
-      });
+            const method = isFollowing ? "DELETE" : "POST";
 
-      if (response.ok) {
-        const newFollowStatus = {
-          ...followStatus,
-          [userId]: !isFollowing,
-        };
-        setFollowStatus(newFollowStatus);
+            const response = await fetchWithAuth(relativeEndpoint, {
+                method,
+            });
 
-        const sortedUsers = sortUsers(users, newFollowStatus);
-        setUsers(sortedUsers);
-      } else {
-        const errorData = await response.json();
-        console.error("Failed to update follow status:", errorData);
-      }
-    } catch (error) {
-      console.error("Error toggling follow status:", error);
-    }
-  };
+            if (response.ok) {
+                const newFollowStatus = {
+                    ...followStatus,
+                    [userId]: !isFollowing,
+                };
+                setFollowStatus(newFollowStatus);
+
+                const sortedUsers = sortUsers(users, newFollowStatus);
+                setUsers(sortedUsers);
+            } else {
+                let errorData = { message: `Failed to update follow status. Status: ${response.status}` };
+                try {
+                    errorData = await response.json();
+                } catch (e) {
+                }
+                console.error("Failed to update follow status:", errorData.message || response.statusText);
+                    setError(errorData.message || `Failed to update follow status. Please try again.`);
+            }
+        } catch (error) {
+            console.error("Error toggling follow status:", error);
+                setError("An unexpected error occurred while updating follow status.");
+        }
+    };
 
   const handleUserSearch = async () => {
     if (!userSearchQuery.trim()) {
@@ -209,7 +225,7 @@ const Dashboard = () => {
 
     try {
       const response = await fetchWithAuth(
-        `http://localhost:8080/api/users/search?username=${encodeURIComponent(
+        `/api/users/search?username=${encodeURIComponent(
           userSearchQuery
         )}`
       );
@@ -258,7 +274,7 @@ const Dashboard = () => {
       let searchResults;
       if (selectedPlaylist) {
         const playlistSongs = await fetchWithAuth(
-          `http://localhost:8080/api/playlists/${selectedPlaylist.id}/songs`
+          `/api/playlists/${selectedPlaylist.id}/songs`
         );
         if (playlistSongs.ok) {
           const allPlaylistSongs = await playlistSongs.json();
@@ -270,7 +286,7 @@ const Dashboard = () => {
         }
       } else {
         const response = await fetchWithAuth(
-          `http://localhost:8080/api/songs/search?title=${encodeURIComponent(
+          `/api/songs/search?title=${encodeURIComponent(
             searchQuery
           )}`
         );
@@ -301,7 +317,7 @@ const Dashboard = () => {
       setLoading(true);
 
       const playlistResponse = await fetchWithAuth(
-        "http://localhost:8080/api/playlists/user"
+        "/api/playlists/user"
       );
       if (playlistResponse.ok) {
         const playlistData = await playlistResponse.json();

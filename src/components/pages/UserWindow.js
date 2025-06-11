@@ -38,7 +38,7 @@ const UserWindow = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await fetchWithAuth(`http://localhost:8080/api/users/${userId}`);
+      const response = await fetchWithAuth(`/api/users/${userId}`);
       if (response.ok) {
         const data = await response.json();
         setUserData(data);
@@ -53,7 +53,7 @@ const UserWindow = () => {
 
   const fetchUserSongs = async () => {
     try {
-      const response = await fetchWithAuth(`http://localhost:8080/api/songs/user/${userId}`);
+      const response = await fetchWithAuth(`/api/songs/user/${userId}`);
       if (response.ok) {
         const data = await response.json();
         setUserSongs(data);
@@ -83,7 +83,7 @@ const UserWindow = () => {
 
   const checkFollowStatus = async () => {
     try {
-      const response = await fetchWithAuth(`http://localhost:8080/api/users/friends/is-following/${userId}`);
+      const response = await fetchWithAuth(`/api/users/friends/is-following/${userId}`);
       if (response.ok) {
         const data = await response.json();
         setIsFollowing(data.following);
@@ -96,8 +96,8 @@ const UserWindow = () => {
   const toggleFollow = async () => {
     try {
       const endpoint = isFollowing ? 
-        `http://localhost:8080/api/users/friends/unfollow/${userId}` : 
-        `http://localhost:8080/api/users/friends/follow/${userId}`;
+        `/api/users/friends/unfollow/${userId}` : 
+        `/api/users/friends/follow/${userId}`;
       
       const method = isFollowing ? 'DELETE' : 'POST';
       

@@ -13,6 +13,8 @@ const LoginForm = () => {
   const [loginError, setLoginError] = useState('');
   const [loginSuccess, setLoginSuccess] = useState(false);
 
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -53,7 +55,7 @@ const LoginForm = () => {
         setLoginError('');
         
         try {
-            const response = await fetch('http://localhost:8080/api/auth/login', {
+            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
                 method: 'POST',
                 credentials: 'include', 
                 headers: {
