@@ -26,7 +26,7 @@ const ProfileDetails = () => {
   
   const fetchUserData = async () => {
     try {
-      const response = await fetchWithAuth(`http://localhost:8080/api/users/me`);
+      const response = await fetchWithAuth(`/api/users/me`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch user data');
@@ -47,7 +47,7 @@ const ProfileDetails = () => {
       const token = localStorage.getItem('token');
       console.log('Token postoji:', !!token);
       
-      const response = await fetchWithAuth(`http://localhost:8080/api/playlists/user`);
+      const response = await fetchWithAuth(`/api/playlists/user`);
       console.log('Odgovor od API-ja:', response.status, response.statusText);
       
       if (response.ok) {
